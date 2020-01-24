@@ -119,6 +119,7 @@ class BlockPainter extends CustomPainter {
     c.drawColor(config.backColor, BlendMode.clear);
     c.drawColor(config.backColor, BlendMode.color);
     paintHourBlocks(c, config, hour, model);
+    if (hour == 23) paintLastHour(c, config, dateTime.minute);
     paintMinuteBlocks(c, config, dateTime.minute);
     if (dateTime.minute == 59) paintLastMinute(c, config, dateTime.second);
     paintSecondsBar(c, config, (dateTime.second * 1000) + dateTime.millisecond);
@@ -148,6 +149,18 @@ paintHourBlocks(Canvas c, BlockConfig cfg, int hour, ClockModel model) {
             cfg.topMargin + cfg.hourHeight),
         p);
   }
+}
+
+// Gradually fill in the last (24th) hour block as minute go from 0-60
+paintLastHour(Canvas c, BlockConfig cfg, int minute) {
+  double startW = cfg.blockWidth - cfg.blockWidth / 24;
+  double left = cfg.leftMargin + startW;
+  double top = cfg.topMargin;
+  double w = cfg.blockWidth / (24*60);
+  c.drawRect(
+      Rect.fromLTRB(left, top, left + (w * minute) - cfg.blockMargin,
+          top + cfg.hourHeight),
+      Paint()..color = cfg.fillColor);
 }
 
 // Draw 60 blocks to represent the minute
